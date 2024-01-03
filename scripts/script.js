@@ -20,6 +20,25 @@ const monsterName = document.querySelector("#monsterName");
 const monsterHealthText = document.querySelector("#monsterHealth");
 
 //objects
+const weapons = [
+    {
+    name: "stick",
+    power: 5,
+    },
+    {
+    name: "dagger",
+    power: 30,
+    },
+    {
+    name: "claw hammer",
+    power: 50,
+    },
+    {
+    name: "sword",
+    power: 100,
+    }
+];
+
 const monsters = [
     {
     name: "slime",
@@ -35,84 +54,60 @@ const monsters = [
     name: "dragon",
     level: 20,
     health: 300,
-    },
+    }
 ];
+
 const locations = [
-  {
+    {
     name: "town square",
     "button text": ["Go to store", "Go to cave", "Fight dragon"],
     "button functions": [goStore, goCave, fightDragon],
     text: 'You are in the town square. You see a sign that says "Store".',
-  },
-  {
+    },
+    {
     name: "store",
-    "button text": [
-      "Buy 10 health (10 gold)",
-      "Buy weapon (30 gold)",
-      "Go to town square",
-    ],
+    "button text": ["Buy 10 health (10 gold)", "Buy weapon (30 gold)", "Go to town square"],
     "button functions": [buyHealth, buyWeapon, goTown],
     text: "You enter the store.",
-  },
-  {
+    },
+    {
     name: "cave",
     "button text": ["Fight slime", "Fight fanged beast", "Go to town square"],
     "button functions": [fightSlime, fightBeast, goTown],
     text: "You enter the cave. You see some monsters.",
-  },
-  {
+    },
+    {
     name: "fight",
     "button text": ["Attack", "Dodge", "Run"],
     "button functions": [attack, dodge, goTown],
     text: "You are fighting a monster.",
-  },
-  {
+    },
+    {
     name: "kill monster",
-    "button text": [
-      "Go to town square",
-      "Go to town square",
-      "Go to town square",
-    ],
+    "button text": ["Go to town square", "Go to town square", "Go to town square"],
     "button functions": [goTown, goTown, easterEgg],
     text: 'The monster screams "Arg!" as it dies. You gain experience points and find gold.',
-  },
-  {
+    },
+    {
     name: "lose",
     "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
     "button functions": [restart, restart, restart],
     text: "You die. ☠️",
-  },
-  {
+    },
+    {
     name: "win",
     "button text": ["REPLAY?", "REPLAY?", "REPLAY?"],
     "button functions": [restart, restart, restart],
     text: "You defeat the dragon! YOU WIN THE GAME! 🎉",
-  },
-  {
+    },
+    {
     name: "easter egg",
     "button text": ["2", "8", "Go to town square?"],
     "button functions": [pickTwo, pickEight, goTown],
     text: "You find a secret game. Pick a number above. Ten numbers will be randomly chosen between 0 and 10. If the number you choose matches one of the random numbers, you win!",
-  },
+    },
 ];
-const weapons = [
-    {
-    name: "stick",
-    "power": 5,
-    },
-    {
-    name: "dagger",
-    "power": 30,
-    },
-    {
-    name: "claw hammer",
-    "power": 50,
-    },
-    {
-    name: "sword",
-    "power": 100,
-    }
-];
+
 
 //initialize buttons
 button1.onclick = goStore;
@@ -140,15 +135,7 @@ function goStore() {
 }
 
 function goCave() {
-  update(locations[2]);
-}
-
-function goFight() {
-    update(locations[3]);
-    monsterHealth = monsters[fighting].health;
-    monsterStats.style.display = "block";
-    monsterName.innerText = monsters[fighting].name;
-    monsterHealthText.innerText = monsterHealth;
+    update(locations[2]);
 }
 
 //store functions
@@ -202,13 +189,21 @@ function fightSlime() {
 }
 
 function fightBeast() {
-  fighting = 1;
-  goFight();
+    fighting = 1;
+    goFight();
 }
 
 function fightDragon() {
-  fighting = 2;
-  goFight();
+    fighting = 2;
+    goFight();
+}
+
+function goFight() {
+    update(locations[3]);
+    monsterHealth = monsters[fighting].health;
+    monsterStats.style.display = "block";
+    monsterName.innerText = monsters[fighting].name;
+    monsterHealthText.innerText = monsterHealth;
 }
 
 //player actions
@@ -216,10 +211,8 @@ function attack() {
     text.innerText = "The " + monsters[fighting].name + " attacks.";
     text.innerText += " You attack it with your " + weapons[currentWeapon].name + ".";
     health -= getMonsterAttackValue(monsters[fighting].level);
-    monsterHealth -= weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;
     if (isMonsterHit()) {
-      monsterHealth -=
-        weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;
+      monsterHealth -= weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;
     } else {
         text.innerText += " You miss.";
     }
@@ -237,7 +230,7 @@ function attack() {
 }
 
 function getMonsterAttackValue(level) {
-    const hit = level * 5 - Math.floor(Math.random() * xp);
+    const hit = (level * 5) - (Math.floor(Math.random() * xp));
     console.log(hit);
     return hit > 0 ? hit : 0;
 }
@@ -291,24 +284,24 @@ function pickEight() {
 }
 
 function pick(guess) {
-  const numbers = [];
-  while (numbers.length < 10) {
-    numbers.push(Math.floor(Math.random() * 11));
-  }
-  text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
-  for (let i = 0; i < 10; i++) {
-    text.innerText += numbers[i] + "\n";
-  }
-  if (numbers.indexOf(guess) !== -1) {
-    text.innerText += "Right! You win 20 gold!";
-    gold += 20;
-    goldText.innerText = gold;
-  } else {
-    text.innerText += "Wrong! You lose 10 health!";
-    health -= 10;
-    healthText.innerText = health;
-    if (health <= 0) {
-      lose();
+    const numbers = [];
+    while (numbers.length < 10) {
+        numbers.push(Math.floor(Math.random() * 11));
     }
-  }
+    text.innerText = "You picked " + guess + ". Here are the random numbers:\n";
+    for (let i = 0; i < 10; i++) {
+        text.innerText += numbers[i] + "\n";
+    }
+    if (numbers.indexOf(guess) !== -1) {
+        text.innerText += "Right! You win 20 gold!";
+        gold += 20;
+        goldText.innerText = gold;
+    } else {
+        text.innerText += "Wrong! You lose 10 health!";
+        health -= 10;
+        healthText.innerText = health;
+        if (health <= 0) {
+            lose();
+        }
+    }
 }
